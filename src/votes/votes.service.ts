@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateVoteInput } from './dto/create-vote.input';
 import { UpdateVoteInput } from './dto/update-vote.input';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,10 +10,11 @@ import { PubSub } from 'graphql-subscriptions';
 
 @Injectable()
 export class VotesService {
-  private pubSub = new PubSub();
+
   constructor(
     @InjectRepository(Vote)
     private readonly votesRepository: Repository<Vote>,
+    @Inject('PUB_SUB') private pubSub: PubSub,
   ) {}
 
   async create(createVoteInput: CreateVoteInput) {
@@ -28,6 +29,7 @@ export class VotesService {
       where: { voteId: savedVote.voteId },
       relations:  ['user', 'option', 'option.poll', 'option.votes'],
     });
+
     if (!voteWithRelations) {
       throw new Error(`Vote with ID ${savedVote.voteId} not found`);
     }

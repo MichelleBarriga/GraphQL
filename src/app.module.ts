@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { OptionsModule } from './options/options.module';
 import { PollsModule } from './polls/polls.module';
 import { VotesModule } from './votes/votes.module';
+import { pubSub } from './pubSub.provider';
 
 @Module({
   imports: [
@@ -26,6 +27,12 @@ import { VotesModule } from './votes/votes.module';
     PollsModule,
     VotesModule,
   ],
-  providers: [AppResolver],
+  providers: [
+    AppResolver,
+    {
+      provide: 'PUB_SUB',
+      useValue: pubSub,
+    },
+  ],
 })
 export class AppModule {}
