@@ -26,7 +26,7 @@ export class VotesService {
 
     const voteWithRelations = await this.votesRepository.findOne({
       where: { voteId: savedVote.voteId },
-      relations: ['user', 'option']
+      relations:  ['user', 'option', 'option.poll', 'option.votes'],
     });
     if (!voteWithRelations) {
       throw new Error(`Vote with ID ${savedVote.voteId} not found`);
@@ -36,7 +36,7 @@ export class VotesService {
       onVote: { 
         pollId: voteWithRelations.option.poll.pollId,
         optionId: voteWithRelations.option.optionId,
-        votesCount: voteWithRelations.option.votes.length + 1 
+        votesCount: voteWithRelations.option.votes.length
       }
     });
 
