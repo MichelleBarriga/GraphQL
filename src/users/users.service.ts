@@ -4,6 +4,8 @@ import { UpdateUserInput } from './dto/update-user.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { Poll } from 'src/polls/entities/poll.entity';
+import { Vote } from 'src/votes/entities/vote.entity';
 
 @Injectable()
 export class UsersService {
@@ -22,9 +24,24 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  findOne(userId: number) {
-    return this.usersRepository.findOne({ where: { userId: userId } });
+  // This method retrives user info by id with the polls that he created and votes he made.
+  async findOne(userId: number): Promise<User> {
+  const user = await this.usersRepository
+    .createQueryBuilder('user')
+    .leftJoinAndSelect('user.polls', 'createdPolls')
+    .leftJoinAndSelect('user.votes', 'vote')
+    .leftJoinAndSelect('vote.option', 'option')
+    .leftJoinAndSelect('option.poll', 'votedPoll')
+    .where('user.userId = :userId', { userId })
+    .getOne();
+
+  if (!user) {
+    throw new Error(`User with ID ${userId} not found`);
   }
+
+  return user;
+}
+
 
   async update(userId: number, updateUserInput: UpdateUserInput) {
     await this.usersRepository.update({userId}, updateUserInput);

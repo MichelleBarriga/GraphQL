@@ -22,8 +22,10 @@ export class User {
   createdAt: Date;
 
   @OneToMany(() => Poll, poll => poll.createdBy)
+  @Field(() => [Poll])
   polls: Poll[];
 
   @OneToMany(() => Vote, vote => vote.user)
+  @Field(() => [Vote])
   votes: Vote[];
 }
